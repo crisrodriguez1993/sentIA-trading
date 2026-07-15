@@ -1,0 +1,39 @@
+# Sentia-Trading — Dependencias
+# Compatible con venv local y Google Colab (pip install -r requirements.txt).
+
+# --- Núcleo de datos ---
+numpy
+pandas
+pyyaml
+yfinance            # precios OHLCV y fundamentales (gratuito)
+requests            # acceso a APIs públicas (SEC EDGAR, GDELT)
+
+# --- Features técnicos ---
+ta                  # indicadores técnicos (RSI, MACD, etc.)
+
+# --- Modelo cuantitativo ---
+scikit-learn
+lightgbm
+xgboost
+
+# --- Análisis de sentimiento (NLP) ---
+transformers        # FinBERT vía Hugging Face
+torch               # backend para transformers
+gdeltdoc            # noticias/eventos geopolíticos (GDELT)
+
+# --- Backtesting ---
+vectorbt            # motor de backtesting vectorizado
+
+# --- Dashboard ---
+streamlit
+
+# --- Visualización ---
+matplotlib
+plotly
+
+# --- Notebooks / experimentación ---
+jupyter
+ipykernel
+
+# --- Utilidades ---
+tqdm

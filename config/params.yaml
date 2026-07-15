@@ -1,0 +1,50 @@
+# Parámetros del proyecto — Sentia-Trading
+# Fechas, umbrales de etiquetado, backtesting e hiperparámetros base.
+
+# --- Rango histórico de datos ---
+data:
+  start_date: "2018-01-01"
+  end_date: null            # null = hasta hoy
+  interval: "1d"            # frecuencia diaria (cierre)
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+
+# --- Definición del target (clasificación) ---
+# ¿El retorno acumulado a `horizon` días supera `threshold`?
+target:
+  horizon_days: 5
+  threshold: 0.015          # +1.5%
+
+# --- Backtesting ---
+backtest:
+  initial_capital: 100000   # USD
+  rebalance: "weekly"       # weekly | monthly
+  commission: 0.0005        # 0.05% por operación (simulado)
+  benchmark: "SPY"
+
+# --- Regímenes de estrés (ventanas de evaluación) ---
+regimes:
+  covid:        { start: "2020-01-01", end: "2021-12-31" }
+  ai_boom:      { start: "2023-01-01", end: "2025-12-31" }
+  geopolitics:  { start: "2022-01-01", end: "2026-06-30" }
+
+# --- Gestión de riesgo (señales macro) ---
+risk:
+  vix_threshold: 30         # por encima: reducir exposición
+  cash_shift: 0.5           # % a mover a caja/refugio en estrés
+
+# --- Modelo cuantitativo (base, se afina en Fase 4) ---
+model_quant:
+  algorithm: "lightgbm"     # lightgbm | xgboost
+  random_state: 42
+  n_estimators: 500
+  learning_rate: 0.05
+  max_depth: -1
+
+# --- Modelo de sentimiento (Fase 5) ---
+model_sentiment:
+  model_name: "ProsusAI/finbert"
+  batch_size: 16
+
+# --- Reproducibilidad ---
+seed: 42

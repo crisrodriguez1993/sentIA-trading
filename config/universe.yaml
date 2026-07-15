@@ -1,0 +1,43 @@
+# Universo de datos — Sentia-Trading
+# Empresas, benchmark y activos macro/refugio para el sistema híbrido.
+# Añadir tickers aquí NO requiere cambiar código (escalable a producción).
+
+# --- Empresas del portafolio (activos operables) ---
+companies:
+  - ticker: NVDA
+    name: NVIDIA
+    sector: IA / Semiconductores
+    group: ai            # ai | traditional
+  - ticker: GOOGL
+    name: Alphabet (Google)
+    sector: IA / Tecnología
+    group: ai
+  - ticker: MSFT
+    name: Microsoft
+    sector: IA / Software
+    group: ai
+  - ticker: AMZN
+    name: Amazon
+    sector: IA / Cloud + Retail
+    group: ai
+  - ticker: NSRGY
+    name: Nestlé (ADR)
+    sector: Retail / Consumo defensivo
+    group: traditional
+
+# --- Benchmark pasivo (Buy & Hold) ---
+benchmark:
+  ticker: SPY
+  name: SPDR S&P 500 ETF Trust
+
+# --- Activos de contexto macro / refugio (no operables por defecto) ---
+macro:
+  - ticker: "^VIX"
+    name: CBOE Volatility Index
+    role: fear_index
+  - ticker: "GC=F"
+    name: Gold Futures
+    role: safe_haven
+  - ticker: "CL=F"
+    name: Crude Oil Futures
+    role: commodity

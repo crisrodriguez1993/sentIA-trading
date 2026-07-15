@@ -1,0 +1,33 @@
+# --- Datos (no versionar datasets pesados) ---
+data/raw/
+data/processed/
+*.csv
+*.parquet
+*.pkl
+!config/**
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# --- Entornos virtuales ---
+.venv/
+venv/
+env/
+
+# --- Modelos entrenados / artefactos ---
+models/*.bin
+models/*.pt
+models/*.joblib
+
+# --- Configuración local / secretos ---
+.env
+*.local
+
+# --- Sistema operativo / editor ---
+.DS_Store
+.vscode/
+.idea/
