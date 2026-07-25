@@ -93,6 +93,11 @@ def model_quant_config() -> dict[str, Any]:
     return load_params()["model_quant"]
 
 
+def model_lstm_config() -> dict[str, Any]:
+    """Hiperparámetros del modelo secuencial LSTM (Fase 4-bis)."""
+    return load_params()["model_lstm"]
+
+
 def seed() -> int:
     """Semilla global de reproducibilidad."""
     return int(load_params().get("seed", 42))

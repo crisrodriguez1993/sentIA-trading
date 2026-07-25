@@ -46,5 +46,15 @@ model_sentiment:
   model_name: "ProsusAI/finbert"
   batch_size: 16
 
+# --- Modelo secuencial de contraste (Fase 4-bis: LSTM) ---
+model_lstm:
+  lookback: 20              # días de historia por secuencia
+  hidden_size: 64
+  num_layers: 2
+  dropout: 0.2
+  epochs: 30
+  batch_size: 128
+  learning_rate: 0.001
+
 # --- Reproducibilidad ---
 seed: 42
