@@ -61,3 +61,22 @@ def date_range() -> tuple[str, str]:
     start = data_cfg["start_date"]
     end = data_cfg["end_date"] or date.today().isoformat()
     return start, end
+
+
+def price_interval() -> str:
+    """Frecuencia de los datos de precio (p. ej. '1d')."""
+    return load_params()["data"]["interval"]
+
+
+def raw_dir() -> Path:
+    """Directorio de datos crudos (creado si no existe)."""
+    path = PROJECT_ROOT / load_params()["data"]["raw_dir"]
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def processed_dir() -> Path:
+    """Directorio de datasets procesados (creado si no existe)."""
+    path = PROJECT_ROOT / load_params()["data"]["processed_dir"]
+    path.mkdir(parents=True, exist_ok=True)
+    return path
