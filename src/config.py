@@ -86,3 +86,27 @@ def target_config() -> tuple[int, float]:
     """Configuración del target: (horizonte en días, umbral de retorno)."""
     tgt = load_params()["target"]
     return int(tgt["horizon_days"]), float(tgt["threshold"])
+
+
+def model_quant_config() -> dict[str, Any]:
+    """Hiperparámetros y algoritmo del modelo cuantitativo."""
+    return load_params()["model_quant"]
+
+
+def seed() -> int:
+    """Semilla global de reproducibilidad."""
+    return int(load_params().get("seed", 42))
+
+
+def models_dir() -> Path:
+    """Directorio de artefactos de modelos entrenados (creado si no existe)."""
+    path = PROJECT_ROOT / "models"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def reports_dir() -> Path:
+    """Directorio de reportes/métricas de evaluación (creado si no existe)."""
+    path = PROJECT_ROOT / "reports"
+    path.mkdir(parents=True, exist_ok=True)
+    return path

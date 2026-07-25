@@ -23,6 +23,11 @@ models/*.bin
 models/*.pt
 models/*.joblib
 
+# --- Reportes: ignorar pesados, conservar métricas (CSV/JSON) para la tesis ---
+reports/*.png
+!reports/*.csv
+!reports/*.json
+
 # --- Configuración local / secretos ---
 .env
 *.local
