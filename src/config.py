@@ -80,3 +80,9 @@ def processed_dir() -> Path:
     path = PROJECT_ROOT / load_params()["data"]["processed_dir"]
     path.mkdir(parents=True, exist_ok=True)
     return path
+
+
+def target_config() -> tuple[int, float]:
+    """Configuración del target: (horizonte en días, umbral de retorno)."""
+    tgt = load_params()["target"]
+    return int(tgt["horizon_days"]), float(tgt["threshold"])
