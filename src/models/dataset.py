@@ -62,7 +62,7 @@ def feature_columns(df: pd.DataFrame) -> list[str]:
     ]
 
 
-def prepare_dataset(dropna_features: bool = True) -> Dataset:
+def prepare_dataset(dropna_features: bool = True, exclude: list[str] | None = None) -> Dataset:
     """Prepara el dataset: filtra filas con target válido y ordena por fecha.
 
     Los modelos de boosting (LightGBM/XGBoost) manejan NaN de forma nativa, por
@@ -73,6 +73,8 @@ def prepare_dataset(dropna_features: bool = True) -> Dataset:
     Args:
         dropna_features: si True, elimina filas sin features técnicos/macro
             (warmup). Los features fundamentales pueden permanecer NaN.
+        exclude: nombres de columnas de features a excluir (p. ej. para estudios
+            de ablación con vs. sin sentimiento).
 
     Returns:
         Objeto `Dataset` con X, y, fechas, tickers y nombres de features.
@@ -84,6 +86,8 @@ def prepare_dataset(dropna_features: bool = True) -> Dataset:
     df = df.sort_values(["date", "ticker"]).reset_index(drop=True)
 
     features = feature_columns(df)
+    if exclude:
+        features = [c for c in features if c not in set(exclude)]
 
     if dropna_features:
         fundamental_cols = set(fundamental_feature_columns())
