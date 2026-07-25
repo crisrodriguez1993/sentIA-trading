@@ -22,6 +22,7 @@ from src.data import fundamentals as fund_data
 from src.data import prices as price_data
 from src.features import target as target_mod
 from src.features.fundamental import align_fundamentals_to_daily
+from src.features.sentiment import add_sentiment_features
 from src.features.technical import add_technical_features
 
 
@@ -73,6 +74,7 @@ def build_dataset(refresh: bool = False) -> pd.DataFrame:
         if not macro.empty:
             df = df.merge(macro, on="date", how="left")
         df = align_fundamentals_to_daily(df, fundamentals, ticker)
+        df = add_sentiment_features(df, ticker)
         df = target_mod.add_target(df)
 
         all_rows.append(df)

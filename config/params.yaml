@@ -46,6 +46,14 @@ model_sentiment:
   model_name: "ProsusAI/finbert"
   batch_size: 16
 
+# --- Ingesta de noticias (Fase 5) ---
+news:
+  source: "gdelt"          # gdelt
+  chunk: "monthly"         # granularidad de las consultas por fecha
+  max_records: 250         # máximo de artículos por consulta (límite GDELT)
+  language: "english"
+  raw_dir: "data/raw/news"
+
 # --- Modelo secuencial de contraste (Fase 4-bis: LSTM) ---
 model_lstm:
   lookback: 20              # días de historia por secuencia

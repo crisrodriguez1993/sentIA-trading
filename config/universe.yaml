@@ -8,22 +8,27 @@ companies:
     name: NVIDIA
     sector: IA / Semiconductores
     group: ai            # ai | traditional
+    news_keyword: "Nvidia"
   - ticker: GOOGL
     name: Alphabet (Google)
     sector: IA / Tecnología
     group: ai
+    news_keyword: "Google Alphabet"
   - ticker: MSFT
     name: Microsoft
     sector: IA / Software
     group: ai
+    news_keyword: "Microsoft"
   - ticker: AMZN
     name: Amazon
     sector: IA / Cloud + Retail
     group: ai
+    news_keyword: "Amazon"
   - ticker: NSRGY
     name: Nestlé (ADR)
     sector: Retail / Consumo defensivo
     group: traditional
+    news_keyword: "Nestle"
 
 # --- Benchmark pasivo (Buy & Hold) ---
 benchmark:

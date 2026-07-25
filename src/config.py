@@ -40,6 +40,19 @@ def company_tickers() -> list[str]:
     return [c["ticker"] for c in load_universe()["companies"]]
 
 
+def companies() -> list[dict[str, Any]]:
+    """Lista completa de dicts de empresas (ticker, name, sector, group, ...)."""
+    return load_universe()["companies"]
+
+
+def news_keyword(ticker: str) -> str:
+    """Palabra clave de búsqueda de noticias para un ticker (fallback al nombre)."""
+    for c in load_universe()["companies"]:
+        if c["ticker"] == ticker:
+            return c.get("news_keyword", c.get("name", ticker))
+    return ticker
+
+
 def macro_tickers() -> list[str]:
     """Lista de tickers de activos macro/refugio."""
     return [m["ticker"] for m in load_universe()["macro"]]
@@ -96,6 +109,23 @@ def model_quant_config() -> dict[str, Any]:
 def model_lstm_config() -> dict[str, Any]:
     """Hiperparámetros del modelo secuencial LSTM (Fase 4-bis)."""
     return load_params()["model_lstm"]
+
+
+def model_sentiment_config() -> dict[str, Any]:
+    """Configuración del modelo de sentimiento (FinBERT)."""
+    return load_params()["model_sentiment"]
+
+
+def news_config() -> dict[str, Any]:
+    """Configuración de la ingesta de noticias."""
+    return load_params()["news"]
+
+
+def news_dir() -> Path:
+    """Directorio de noticias crudas (creado si no existe)."""
+    path = PROJECT_ROOT / load_params()["news"]["raw_dir"]
+    path.mkdir(parents=True, exist_ok=True)
+    return path
 
 
 def seed() -> int:

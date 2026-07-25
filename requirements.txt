@@ -5,6 +5,7 @@
 numpy
 pandas
 pyyaml
+pyarrow             # backend parquet para datasets procesados
 yfinance            # precios OHLCV y fundamentales (gratuito)
 requests            # acceso a APIs públicas (SEC EDGAR, GDELT)
 

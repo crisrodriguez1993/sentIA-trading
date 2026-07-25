@@ -49,6 +49,8 @@ source .venv/bin/activate        # macOS / Linux
 pip install -r requirements.txt
 ```
 
+> **macOS**: LightGBM y XGBoost requieren la librería nativa OpenMP. Instálala con `brew install libomp`.
+
 ### Opción B — Google Colab
 Sube el repositorio o clónalo, y en la primera celda:
 ```python
