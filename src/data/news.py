@@ -4,9 +4,12 @@ GDELT Doc API permite buscar artículos por palabra clave y rango de fechas,
 devolviendo hasta `max_records` por consulta. Para cubrir 2018→hoy sin superar
 ese límite, se trocea el rango en ventanas mensuales y se consulta por empresa.
 
-El resultado (titulares + fecha) se cachea por ticker en `data/raw/news/` para
-no repetir descargas. La red se maneja de forma resiliente: si un chunk falla,
-se registra un aviso y se continúa.
+El resultado (titulares + fecha) se cachea por ticker en `data/raw/news/`. La
+descarga es **reanudable mes a mes**: cada mes descargado se persiste de forma
+incremental en un archivo `<ticker>.partial.csv` junto con un registro de meses
+completados (`<ticker>.progress.txt`). Si el proceso se interrumpe, al reanudar
+se saltan los meses ya descargados. Cuando todos los meses están listos, se
+consolida el CSV final `<ticker>.csv` y se limpian los temporales.
 """
 
 from __future__ import annotations
@@ -34,6 +37,32 @@ def _cache_path(ticker: str) -> Path:
     return config.news_dir() / f"{ticker}.csv"
 
 
+def _partial_path(ticker: str) -> Path:
+    return config.news_dir() / f"{ticker}.partial.csv"
+
+
+def _progress_path(ticker: str) -> Path:
+    return config.news_dir() / f"{ticker}.progress.txt"
+
+
+def _load_completed_months(ticker: str) -> set[str]:
+    """Meses (por fecha de inicio) ya descargados para un ticker."""
+    path = _progress_path(ticker)
+    if not path.exists():
+        return set()
+    return {line.strip() for line in path.read_text().splitlines() if line.strip()}
+
+
+def _mark_month_done(ticker: str, chunk_start: str, rows: pd.DataFrame | None) -> None:
+    """Persiste incrementalmente las filas del mes y lo marca como completado."""
+    if rows is not None and not rows.empty:
+        partial = _partial_path(ticker)
+        header = not partial.exists()
+        rows.to_csv(partial, mode="a", header=header, index=False)
+    with _progress_path(ticker).open("a", encoding="utf-8") as fh:
+        fh.write(f"{chunk_start}\n")
+
+
 def download_news_for_ticker(
     ticker: str,
     start: str | None = None,
@@ -45,7 +74,8 @@ def download_news_for_ticker(
     """Descarga (o carga de caché) los titulares de noticias de un ticker.
 
     GDELT limita a 1 consulta cada ~5 s; respetamos ese ritmo con `pause` y
-    reintentamos con backoff ante fallos transitorios.
+    reintentamos con backoff ante fallos transitorios. La descarga es reanudable:
+    los meses ya completados (registrados en `<ticker>.progress.txt`) se saltan.
 
     Returns:
         DataFrame con columnas [ticker, date, title, url, domain].
@@ -60,10 +90,18 @@ def download_news_for_ticker(
     news_cfg = config.news_config()
     max_records = int(news_cfg.get("max_records", 250))
 
+    # Reanudación: si se pide refresh, se descartan los temporales previos.
+    if refresh:
+        _partial_path(ticker).unlink(missing_ok=True)
+        _progress_path(ticker).unlink(missing_ok=True)
+
+    completed = _load_completed_months(ticker)
     gd = GdeltDoc()
-    rows: list[pd.DataFrame] = []
 
     for chunk_start, chunk_end in _month_starts(start, end):
+        if chunk_start in completed:
+            continue  # mes ya descargado en una ejecución anterior
+
         articles = None
         for attempt in range(1, max_retries + 1):
             try:
@@ -82,29 +120,37 @@ def download_news_for_ticker(
                 else:
                     time.sleep(wait)
 
-        if articles is None or articles.empty:
-            time.sleep(pause)
-            continue
+        month_rows: pd.DataFrame | None = None
+        if articles is not None and not articles.empty:
+            df = articles.copy()
+            # Filtrar a inglés si la columna existe (FinBERT es de dominio EN).
+            if "language" in df.columns:
+                df = df[df["language"].str.lower().eq("english")]
+            if not df.empty:
+                df["date"] = pd.to_datetime(df["seendate"], errors="coerce").dt.tz_localize(None).dt.normalize()
+                df["ticker"] = ticker
+                keep = [c for c in ["ticker", "date", "title", "url", "domain"] if c in df.columns]
+                month_rows = df[keep].dropna(subset=["date", "title"])
 
-        df = articles.copy()
-        # Filtrar a inglés si la columna existe (FinBERT es de dominio EN).
-        if "language" in df.columns:
-            df = df[df["language"].str.lower().eq("english")]
-        if not df.empty:
-            df["date"] = pd.to_datetime(df["seendate"], errors="coerce").dt.tz_localize(None).dt.normalize()
-            df["ticker"] = ticker
-            keep = [c for c in ["ticker", "date", "title", "url", "domain"] if c in df.columns]
-            rows.append(df[keep].dropna(subset=["date", "title"]))
+        # Solo marcar el mes como hecho si la consulta no falló por completo.
+        if articles is not None:
+            _mark_month_done(ticker, chunk_start, month_rows)
         time.sleep(pause)
 
-    if not rows:
+    # Consolidar el parcial en el CSV final.
+    partial = _partial_path(ticker)
+    if not partial.exists():
         print(f"[news] {ticker}: sin noticias descargadas")
         return pd.DataFrame(columns=["ticker", "date", "title", "url", "domain"])
 
-    out = pd.concat(rows, ignore_index=True).drop_duplicates(subset=["title", "date"])
-    out = out.sort_values("date").reset_index(drop=True)
-    cache.parent.mkdir(parents=True, exist_ok=True)
+    out = pd.read_csv(partial, parse_dates=["date"])
+    out = out.drop_duplicates(subset=["title", "date"]).sort_values("date").reset_index(drop=True)
     out.to_csv(cache, index=False)
+
+    # Limpieza de temporales tras consolidar con éxito.
+    partial.unlink(missing_ok=True)
+    _progress_path(ticker).unlink(missing_ok=True)
+
     print(f"[news] {ticker}: {len(out)} titulares ({out['date'].min().date()} → {out['date'].max().date()})")
     return out
 
