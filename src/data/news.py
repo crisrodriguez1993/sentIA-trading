@@ -68,14 +68,17 @@ def download_news_for_ticker(
     start: str | None = None,
     end: str | None = None,
     refresh: bool = False,
-    pause: float = 5.5,
-    max_retries: int = 3,
+    pause: float = 7.0,
+    max_retries: int = 5,
 ) -> pd.DataFrame:
     """Descarga (o carga de caché) los titulares de noticias de un ticker.
 
     GDELT limita a 1 consulta cada ~5 s; respetamos ese ritmo con `pause` y
-    reintentamos con backoff ante fallos transitorios. La descarga es reanudable:
-    los meses ya completados (registrados en `<ticker>.progress.txt`) se saltan.
+    reintentamos con backoff creciente ante fallos de rate limit. La descarga es
+    reanudable: los meses ya completados (registrados en `<ticker>.progress.txt`)
+    se saltan. El CSV final solo se consolida cuando TODOS los meses del rango
+    están descargados; si quedan meses fallidos, se conservan los temporales para
+    reintentarlos en una nueva ejecución (sin repetir los ya logrados).
 
     Returns:
         DataFrame con columnas [ticker, date, title, url, domain].
@@ -96,8 +99,15 @@ def download_news_for_ticker(
         _progress_path(ticker).unlink(missing_ok=True)
 
     completed = _load_completed_months(ticker)
+    all_months = [m[0] for m in _month_starts(start, end)]
+    pending = [m for m in all_months if m not in completed]
     gd = GdeltDoc()
 
+    if pending:
+        print(f"[news] {ticker}: {len(completed)}/{len(all_months)} meses ya listos; "
+              f"faltan {len(pending)}")
+
+    failed_this_run = 0
     for chunk_start, chunk_end in _month_starts(start, end):
         if chunk_start in completed:
             continue  # mes ya descargado en una ejecución anterior
@@ -114,11 +124,11 @@ def download_news_for_ticker(
                 articles = gd.article_search(filters)
                 break
             except Exception as exc:  # noqa: BLE001 - la API puede fallar por red/límite
-                wait = pause * attempt
                 if attempt == max_retries:
-                    print(f"[news] {ticker} {chunk_start}: aviso tras {attempt} intentos ({exc})")
+                    print(f"[news] {ticker} {chunk_start}: falla tras {attempt} intentos (reintentable)")
                 else:
-                    time.sleep(wait)
+                    # Backoff creciente: el rate limit de GDELT suele requerir esperas largas.
+                    time.sleep(pause * (attempt + 1))
 
         month_rows: pd.DataFrame | None = None
         if articles is not None and not articles.empty:
@@ -135,10 +145,23 @@ def download_news_for_ticker(
         # Solo marcar el mes como hecho si la consulta no falló por completo.
         if articles is not None:
             _mark_month_done(ticker, chunk_start, month_rows)
+        else:
+            failed_this_run += 1
         time.sleep(pause)
 
-    # Consolidar el parcial en el CSV final.
     partial = _partial_path(ticker)
+    completed = _load_completed_months(ticker)
+    missing = [m for m in all_months if m not in completed]
+
+    # Si quedan meses por descargar, conservar temporales para reintentar luego.
+    if missing:
+        print(f"[news] {ticker}: cobertura incompleta, faltan {len(missing)} meses "
+              f"(reintentar re-ejecutando). Fallidos en esta pasada: {failed_this_run}")
+        if not partial.exists():
+            return pd.DataFrame(columns=["ticker", "date", "title", "url", "domain"])
+        return pd.read_csv(partial, parse_dates=["date"])
+
+    # Cobertura completa: consolidar el parcial en el CSV final.
     if not partial.exists():
         print(f"[news] {ticker}: sin noticias descargadas")
         return pd.DataFrame(columns=["ticker", "date", "title", "url", "domain"])
