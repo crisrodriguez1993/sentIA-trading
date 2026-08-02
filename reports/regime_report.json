@@ -1,0 +1,68 @@
+{
+  "covid": {
+    "window": {
+      "start": "2020-01-01",
+      "end": "2021-12-31"
+    },
+    "strategy": {
+      "total_return_pct": 19.008564652485262,
+      "annualized_return_pct": 9.07225166379597,
+      "sharpe_ratio": 0.6309210610829978,
+      "sortino_ratio": 0.524863363564435,
+      "max_drawdown_pct": -9.938228726710019,
+      "calmar_ratio": 0.9128640438122897
+    },
+    "benchmark_spy": {
+      "total_return_pct": 50.9154644721177,
+      "annualized_return_pct": 22.79760830062143,
+      "sharpe_ratio": 0.9386456496022899,
+      "sortino_ratio": 1.040422720125863,
+      "max_drawdown_pct": -33.717246288083324,
+      "calmar_ratio": 0.6761408718208042
+    }
+  },
+  "ai_boom": {
+    "window": {
+      "start": "2023-01-01",
+      "end": "2025-12-31"
+    },
+    "strategy": {
+      "total_return_pct": 47.27257486050749,
+      "annualized_return_pct": 13.851489052707944,
+      "sharpe_ratio": 0.6202318067075141,
+      "sortino_ratio": 0.7989531476462286,
+      "max_drawdown_pct": -24.899323489251024,
+      "calmar_ratio": 0.5562998150808233
+    },
+    "benchmark_spy": {
+      "total_return_pct": 86.2817804511618,
+      "annualized_return_pct": 23.178757452738942,
+      "sharpe_ratio": 1.4355059337529794,
+      "sortino_ratio": 1.9306841073015086,
+      "max_drawdown_pct": -18.75522942522173,
+      "calmar_ratio": 1.2358557140105426
+    }
+  },
+  "geopolitics": {
+    "window": {
+      "start": "2022-01-01",
+      "end": "2026-06-30"
+    },
+    "strategy": {
+      "total_return_pct": 4.3509904150091705,
+      "annualized_return_pct": 0.9577244761625137,
+      "sharpe_ratio": 0.1714392082072899,
+      "sortino_ratio": 0.20839218599968268,
+      "max_drawdown_pct": -41.3097797205081,
+      "calmar_ratio": 0.023183964732860936
+    },
+    "benchmark_spy": {
+      "total_return_pct": 66.13850537835091,
+      "annualized_return_pct": 12.031844917735324,
+      "sharpe_ratio": 0.7322934355762952,
+      "sortino_ratio": 1.0130640736731034,
+      "max_drawdown_pct": -24.496381945241662,
+      "calmar_ratio": 0.4911682445444752
+    }
+  }
+}
