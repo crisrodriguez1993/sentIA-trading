@@ -13,7 +13,6 @@
 | Grupo | Tickers |
 |-------|---------|
 | IA / Tecnología | `NVDA`, `GOOGL`, `MSFT`, `AMZN` |
-| Retail / Tradicional | `NSRGY` (Nestlé ADR) |
 | Benchmark | `SPY` |
 | Macro / refugio | `^VIX`, oro (`GC=F`), petróleo (`CL=F`) |
 

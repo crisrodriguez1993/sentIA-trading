@@ -24,11 +24,6 @@ companies:
     sector: IA / Cloud + Retail
     group: ai
     news_keyword: "Amazon"
-  - ticker: NSRGY
-    name: Nestlé (ADR)
-    sector: Retail / Consumo defensivo
-    group: traditional
-    news_keyword: "Nestle"
 
 # --- Benchmark pasivo (Buy & Hold) ---
 benchmark:
