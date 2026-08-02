@@ -1,0 +1,29 @@
+{
+  "strategy": {
+    "total_return_pct": 9.41789993136901,
+    "annualized_return_pct": 1.0600226459927642,
+    "sharpe_ratio": 0.15827005736137847,
+    "sortino_ratio": 0.07316906325177495,
+    "max_drawdown_pct": -20.18038878414191,
+    "calmar_ratio": 0.05252736492498836
+  },
+  "benchmark_spy": {
+    "total_return_pct": 213.16655179402645,
+    "annualized_return_pct": 14.309538181354743,
+    "sharpe_ratio": 0.794954979048661,
+    "sortino_ratio": 0.9750228744802829,
+    "max_drawdown_pct": -33.71724628808334,
+    "calmar_ratio": 0.42439818658655265
+  },
+  "meta": {
+    "tickers": [
+      "NVDA",
+      "GOOGL",
+      "MSFT",
+      "AMZN"
+    ],
+    "benchmark": "SPY",
+    "initial_capital": 100000.0,
+    "commission": 0.0005
+  }
+}
